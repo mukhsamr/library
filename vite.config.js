@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue';
@@ -19,8 +20,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': '/resources/js',
-            'ziggy': '/vendor/tightenco/ziggy/src/js/vue',
+            '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
+            'ziggy': fileURLToPath(new URL('./vendor/tightenco/ziggy/src/js/vue.js', import.meta.url)),
         },
     },
     build: {

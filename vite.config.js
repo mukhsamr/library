@@ -21,7 +21,6 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./resources/js', import.meta.url)),
-            'ziggy': fileURLToPath(new URL('./vendor/tightenco/ziggy/src/js/vue.js', import.meta.url)),
         },
     },
     build: {

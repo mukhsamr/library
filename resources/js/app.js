@@ -5,8 +5,13 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/inertia-vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { InertiaProgress } from '@inertiajs/progress'
-import { ZiggyVue } from 'ziggy';
 import mitt from 'mitt'
+
+const ZiggyVue = {
+    install(app) {
+        app.config.globalProperties.route = (...args) => globalThis.route(...args);
+    },
+};
 
 createInertiaApp({
     resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),

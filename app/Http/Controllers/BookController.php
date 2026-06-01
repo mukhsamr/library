@@ -26,7 +26,7 @@ class BookController extends Controller
             'kolom' => $kolom,
             'buku' => Book::when($request->kategori)
                 ->where($request->kategori, 'like', "%$request->keyword%")
-                ->withCount('loans')
+                ->withCount('activeLoans as loans_count')
                 ->orderBy('nik')
                 ->paginate(10)
                 ->onEachSide(1)
@@ -44,7 +44,7 @@ class BookController extends Controller
     public function detail(Request $request)
     {
         $buku = Book::select('nik', 'judul')->get();
-        $detail = Book::withCount('loans')->when($request->nik)->where('nik', $request->nik)->first();
+        $detail = Book::withCount('activeLoans as loans_count')->when($request->nik)->where('nik', $request->nik)->first();
         $nik = $request->nik ?? $detail->nik ?? null;
 
         return Inertia::render('Buku/Detail', [
@@ -53,7 +53,6 @@ class BookController extends Controller
             'nik' => $nik,
             'riwayat' => Loan::with('loanable:id,nama')
                 ->whereRelation('book', 'nik', $nik)
-                ->withTrashed()
                 ->limit(10)
                 ->latest('created_at')
                 ->get()

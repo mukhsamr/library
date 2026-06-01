@@ -4,6 +4,7 @@ defineProps({
     modelValue: String | Number,
     label: String,
     required: Boolean,
+    invalid: String,
 })
 
 defineEmits(['update:modelValue'])
@@ -28,7 +29,9 @@ const vFocus = {
         </template>
         <input type="text" :value="modelValue" v-bind="$attrs"
             class="form-control block w-full px-3 py-1 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-200 focus:outline-none"
-            :list="id" onfocus="this.select()" @change="$emit('update:modelValue', $event.target.value)" v-focus>
+            :class="{ 'border-red-500': invalid }" :list="id" onfocus="this.select()"
+            @change="$emit('update:modelValue', $event.target.value)" v-focus>
+        <div class="text-red-500" v-if="invalid">{{ invalid }}</div>
 
         <datalist :id="id">
             <slot />

@@ -1,66 +1,119 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Library App
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi perpustakaan berbasis Laravel 9, Inertia, Vue 3, Vite, dan Tailwind CSS. Aplikasi ini mengelola katalog buku, data siswa/karyawan, peminjaman dan pengembalian buku, barcode, print, rekap, serta export PDF/Excel.
 
-## About Laravel
+## Stack Stable
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Proyek ini sengaja dipertahankan pada generasi stack lama yang stabil agar minim breaking change.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Komponen | Versi yang disarankan |
+| --- | --- |
+| PHP | 8.2.x |
+| Composer | 2.x |
+| Node.js | 20 LTS (`.nvmrc`) |
+| Laravel | 9.52.x |
+| Vue | 3.2.x |
+| Vite | 3.x |
+| Tailwind CSS | 3.x |
+| PHPUnit | 9.6.x |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+> Catatan: `composer install` harus dijalankan sebelum `npm run build` karena konfigurasi Vite memakai Ziggy dari folder `vendor/` Composer.
 
-## Learning Laravel
+## Instalasi Lokal
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Install dependency PHP.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+    ```bash
+    composer install
+    ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Install dependency JavaScript.
 
-## Laravel Sponsors
+    ```bash
+    npm install
+    ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+3. Buat file environment.
 
-### Premium Partners
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+4. Sesuaikan koneksi database di `.env`, lalu jalankan migrasi dan seeder.
 
-## Contributing
+    ```bash
+    php artisan migrate --seed
+    ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Buat symbolic link storage agar sampul buku dan foto profil dapat diakses dari `/storage`.
 
-## Code of Conduct
+    ```bash
+    php artisan storage:link
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. Jalankan server development Laravel dan Vite.
 
-## Security Vulnerabilities
+    ```bash
+    php artisan serve
+    npm run dev
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Akun Default Seeder
 
-## License
+Seeder membuat tiga akun awal:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Nama | Password | Level |
+| --- | --- | --- |
+| Admin | `Admin123` | 3 |
+| Operator | `Operator123` | 2 |
+| User | `User123` | 1 |
+
+Level 3 memiliki akses ke menu master data seperti siswa, karyawan, kelas, dan unit.
+
+## Build Production
+
+Jalankan Composer terlebih dahulu agar Ziggy tersedia di folder `vendor/`, lalu build asset.
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm install
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+## Testing
+
+Test menggunakan SQLite in-memory sesuai konfigurasi `phpunit.xml`. CI menjalankan Composer install, NPM install, test backend, dan build frontend pada PHP 8.2 + Node 20.
+
+```bash
+php artisan test
+```
+
+Untuk validasi frontend:
+
+```bash
+npm run build
+```
+
+## Fitur Utama
+
+- Login/logout user.
+- Manajemen buku dan sampul buku.
+- Import buku dari Excel.
+- Peminjaman dan pengembalian buku untuk siswa/karyawan.
+- Riwayat peminjaman dan export Excel.
+- Print data buku, siswa, dan karyawan.
+- Rekap PDF dan ZIP per kelas/unit.
+- Middleware level akses untuk menu admin.
+
+## Catatan Maintenance
+
+- Hindari upgrade major tanpa test karena proyek ini memakai stack Laravel 9 + Inertia adapter lama.
+- Pertahankan `@inertiajs/inertia-vue3` sampai ada rencana migrasi khusus ke adapter Inertia baru.
+- Pertahankan Tailwind 3 untuk menghindari perubahan konfigurasi Tailwind 4.
+- Proyek tidak memakai `tw-elements`; gunakan komponen Vue internal sebelum menambahkan UI dependency baru.
+- Riwayat pengembalian peminjaman memakai kolom `returned_at`; soft delete hanya dipakai untuk penghapusan riwayat administratif.
+- Jika dependency perlu diperbarui, utamakan patch/minor dalam major version yang sama.

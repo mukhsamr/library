@@ -1,5 +1,5 @@
 import './bootstrap';
-import 'tw-elements'
+import './bootstrap-modal';
 
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/inertia-vue3';

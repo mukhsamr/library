@@ -61,17 +61,18 @@ class FormController extends Controller
     {
         $alert = $this::execute(
             try: function () use ($request) {
+                $data = $request->validated();
 
                 // Cek jika ada sampul
                 if ($file = $request->file('sampul')) {
-
                     $name = str($request->nik)->slug()->append('.' . $file->extension());
-                    Image::make($file)->save(Storage::path('sampul/' . $name->value()));
+                    Storage::disk('public')->makeDirectory('sampul');
+                    Image::make($file)->save(Storage::disk('public')->path('sampul/' . $name->value()));
 
-                    $request->merge(['sampul' => $name->value()]);
+                    $data['sampul'] = $name->value();
                 }
 
-                Book::create($request->input());
+                Book::create($data);
             },
             message: "tambah buku <li>$request->judul</li>"
         );
@@ -83,20 +84,25 @@ class FormController extends Controller
     {
         $alert = $this::execute(
             try: function () use ($request) {
+                $book = Book::findOrFail($request->id);
+                $update = $request->validated();
 
                 // Cek jika ada sampul
                 if ($file = $request->file('sampul')) {
-
                     $name = str($request->nik)->slug()->append('.' . $file->extension());
-                    Image::make($file)->save(Storage::path('sampul/' . $name->value()));
+                    Storage::disk('public')->makeDirectory('sampul');
+                    Image::make($file)->save(Storage::disk('public')->path('sampul/' . $name->value()));
 
-                    $request->merge(['sampul' => $name->value()]);
+                    if ($book->sampul && $book->sampul !== $name->value()) {
+                        Storage::disk('public')->delete('sampul/' . $book->sampul);
+                    }
+
+                    $update['sampul'] = $name->value();
+                } else {
+                    unset($update['sampul']);
                 }
 
-                $update = $request->input();
-                array_shift($update);
-
-                Book::where('id', $request->id)->update($update);
+                $book->update($update);
             },
             message: "edit buku <li>$request->judul</li>"
         );

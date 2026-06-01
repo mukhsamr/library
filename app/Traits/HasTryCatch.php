@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 /**
@@ -15,6 +16,8 @@ trait HasTryCatch
         try {
             $try();
             $alert['status'] = 'success';
+        } catch (ValidationException $th) {
+            throw $th;
         } catch (Throwable $th) {
             if ($catch) $catch();
 

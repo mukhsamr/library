@@ -102,7 +102,7 @@ function cariBuku() {
                     <Td :text="item.dipinjam" is-date />
                     <Td :text="item.dikembalikan" is-date />
                     <Td>
-                        <Badge color="success" v-if="item.deleted_at">Selesai</Badge>
+                        <Badge color="success" v-if="item.returned_at">Selesai</Badge>
                         <Badge color="warning" v-else>Sedang dipinjam</Badge>
                     </Td>
                 </template>

@@ -138,9 +138,9 @@ function download() {
                 <Td :text="item.dikembalikan" is-date />
                 <Td :text="item.catatan" />
                 <Td :text="item.dibuat" is-time />
-                <Td :text="item.dihapus" is-time />
+                <Td :text="item.dikembalikan_pada" is-time />
                 <Td>
-                    <Badge color="success" v-if="item.deleted_at">Selesai</Badge>
+                    <Badge color="success" v-if="item.returned_at">Selesai</Badge>
                     <Badge color="warning" v-else>Sedang dipinjam</Badge>
                 </Td>
                 <Td>
@@ -153,11 +153,11 @@ function download() {
                 </Td>
                 <Td>
                     <Dropdown text="aksi" color="secondary">
-                        <DropdownItem text="Selesai" @click="selesai(item.id)" v-if="!item.deleted_at" />
-                        <DropdownItem text="Batalkan" @click="restore(item.id)" v-if="item.deleted_at" />
+                        <DropdownItem text="Selesai" @click="selesai(item.id)" v-if="!item.returned_at" />
+                        <DropdownItem text="Batalkan" @click="restore(item.id)" v-if="item.returned_at" />
                         <hr>
                         <DropdownItem text="Edit" @click="edit(item)" data-bs-toggle="modal" data-bs-target="#edit"
-                            v-if="!item.deleted_at" />
+                            v-if="!item.returned_at" />
                         <DropdownItem text="Hapus" @click="destroy(item.id)" />
                     </Dropdown>
                 </Td>

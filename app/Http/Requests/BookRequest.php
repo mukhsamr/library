@@ -30,7 +30,7 @@ class BookRequest extends FormRequest
             'jumlah_halaman' => 'integer|nullable',
             'jumlah_buku' => 'integer|nullable',
             'deskripsi' => 'string|nullable',
-            'sampul' => 'file|nullable|image',
+            'sampul' => 'file|nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ];
     }
 }

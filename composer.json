@@ -1,16 +1,21 @@
 {
-    "name": "laravel/laravel",
+    "name": "library/library-app",
     "type": "project",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "description": "Sistem perpustakaan berbasis Laravel, Inertia, dan Vue.",
+    "keywords": [
+        "library",
+        "laravel",
+        "inertia",
+        "vue"
+    ],
     "license": "MIT",
     "require": {
-        "php": "^8.0.2",
+        "php": "^8.2",
         "barryvdh/laravel-dompdf": "^2.0",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.3",
         "intervention/image": "^2.7",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^9.52",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^3.1",

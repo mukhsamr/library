@@ -86,9 +86,10 @@ function simpan() {
             <div class="col-span-4">
                 <form @submit.prevent="simpan">
                     <div class="space-y-2">
-                        <Input v-model="formUser.nama" placeholder="username" required />
+                        <Input v-model="formUser.nama" placeholder="username" :invalid="formUser.errors.nama" required />
+                        <div class="text-red-500" v-if="formUser.errors.foto">{{ formUser.errors.foto }}</div>
                         <Input v-model="formUser.password" placeholder="password ( kosongkan jika tidak diubah )"
-                            :type="showPass ? 'text' : 'password'" />
+                            :type="showPass ? 'text' : 'password'" :invalid="formUser.errors.password" />
                         <Input v-model="formUser.confirm" placeholder="konfirmasi password"
                             :type="showPass ? 'text' : 'password'" v-if="formUser.password" />
 

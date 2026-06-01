@@ -29,9 +29,9 @@
             <td>{{ $item->dikembalikan->format('d-m-Y')}}</td>
             <td>{{ $item->catatan }}</td>
             <td>{{ $item->created_at->format('d-m-Y H:i:s') }}</td>
-            <td>{{ $item->deleted_at ? $item->deleted_at->format('d-m-Y H:i:s') :'-' }}</td>
+            <td>{{ $item->returned_at ? $item->returned_at->format('d-m-Y H:i:s') :'-' }}</td>
 
-            @if ($item->deleted_at)
+            @if ($item->returned_at)
             <td>Selesai</td>
             @else
             <td>Sedang dipinjam</td>

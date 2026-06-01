@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Traits\HasTryCatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,23 +21,33 @@ class UserController extends Controller
 
     public function update(Request $request)
     {
-        $alert = $this::execute(
-            try: function () use ($request) {
+        $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:6'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+        ]);
 
-                $update = $request->password
-                    ? $request->only(['nama', 'password'])
-                    : $request->only(['nama']);
+        $alert = $this::execute(
+            try: function () use ($request, $validated) {
+                $user = $request->user();
+                $update = $request->filled('password')
+                    ? collect($validated)->only(['nama', 'password'])->all()
+                    : collect($validated)->only(['nama'])->all();
 
                 // Cek jika ada foto
                 if ($file = $request->file('foto')) {
-
                     $name = str($request->nama)->slug()->append('.' . $file->extension());
-                    Image::make($file)->save(Storage::path('images/' . $name->value()));
+                    Storage::disk('public')->makeDirectory('images');
+                    Image::make($file)->save(Storage::disk('public')->path('images/' . $name->value()));
+
+                    if ($user->foto && $user->foto !== $name->value()) {
+                        Storage::disk('public')->delete('images/' . $user->foto);
+                    }
 
                     $update = array_merge($update, ['foto' => $name->value()]);
                 }
 
-                User::find($request->id)->update($update);
+                $user->update($update);
             },
             message: 'update profil'
         );

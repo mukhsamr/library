@@ -106,4 +106,9 @@ class Book extends Model
     {
         return $this->hasMany(Loan::class);
     }
+
+    public function activeLoans()
+    {
+        return $this->hasMany(Loan::class)->whereNull('returned_at');
+    }
 }

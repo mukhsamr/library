@@ -27,7 +27,6 @@ class LoanExport extends StringValueBinder implements FromView, WithCustomValueB
         return view('exports.riwayat', [
             'riwayat' => Loan::has('loanable')
                 ->with(['book', 'loanable'])
-                ->withTrashed()
                 ->whereDate('created_at', '>=', $this->request->dari)
                 ->whereDate('created_at', '<=', $this->request->sampai)
                 ->orderBy('created_at', 'desc')

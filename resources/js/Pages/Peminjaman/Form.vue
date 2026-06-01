@@ -82,12 +82,15 @@ function pinjam() {
                 <form @submit.prevent="pinjam">
                     <div class="border p-2 space-y-4">
                         <Datalist v-model="formPinjam.user" label="Peminjam" placeholder="cari nama / nik / nis"
-                            required>
+                            :invalid="formPinjam.errors.user" required>
                             <option :value="user.nis ?? user.nik" v-for="user in listUser">{{ user.nama }}</option>
                         </Datalist>
-                        <Input v-model="formPinjam.dari" label="Dari" type="date" required />
-                        <Input v-model="formPinjam.sampai" label="Sampai" type="date" :min="formPinjam.dari" required />
-                        <Textarea v-model="formPinjam.catatan" label="Catatan" placeholder="Tulis Catatan"></Textarea>
+                        <Input v-model="formPinjam.dari" label="Dari" type="date" :invalid="formPinjam.errors.dari" required />
+                        <Input v-model="formPinjam.sampai" label="Sampai" type="date" :min="formPinjam.dari"
+                            :invalid="formPinjam.errors.sampai" required />
+                        <Textarea v-model="formPinjam.catatan" label="Catatan" placeholder="Tulis Catatan"
+                            :invalid="formPinjam.errors.catatan"></Textarea>
+                        <div class="text-red-500" v-if="formPinjam.errors.buku">{{ formPinjam.errors.buku }}</div>
 
                         <Button type="submit" color="success" :disabled="formPinjam.processing">Pinjam</Button>
                     </div>

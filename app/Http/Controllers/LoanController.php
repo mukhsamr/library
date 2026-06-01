@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Exports\LoanExport;
+use App\Http\Requests\LoanRequest;
 use App\Models\Book;
 use App\Models\Loan;
 use App\Models\Staff;
 use App\Models\Student;
-use App\Models\Version;
 use App\Traits\HasTryCatch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
@@ -26,7 +28,7 @@ class LoanController extends Controller
             'listBuku' => Book::select('nik', 'judul')->get(),
             'nikBuku' => $request->nikBuku,
             'buku' => Book::select('id', 'judul', 'nik', 'pengarang', 'penerbit', 'jumlah_buku', 'sampul')
-                ->withCount('loans as dipinjam')
+                ->withCount('activeLoans as dipinjam')
                 ->firstWhere('nik', $request->nikBuku),
 
             'listUser' => $student->concat($staff),
@@ -36,7 +38,6 @@ class LoanController extends Controller
     public function riwayat(Request $request)
     {
         $riwayat = Loan::with(['loanable', 'book:id,nik,judul'])
-            ->withTrashed()
             ->whenStatus($request->status)
 
             // Cari buku / peminjam
@@ -65,7 +66,7 @@ class LoanController extends Controller
             ->onEachSide(1)
             ->withQueryString()
             ->through(function ($item) {
-                $item->append(['dibuat', 'dihapus', 'status']);
+                $item->append(['dibuat', 'dikembalikan_pada', 'status']);
                 return $item;
             });
 
@@ -80,21 +81,36 @@ class LoanController extends Controller
 
     // 
 
-    public function store(Request $request)
+    public function store(LoanRequest $request)
     {
-        $user = Student::firstWhere('nis', $request->user)
-            ?: Staff::firstWhere('nik', $request->user);
+        $peminjam = $request->peminjam();
 
-
-        $insert = [
-            'book_id' => $request->buku,
-            'dipinjam' => $request->dari,
-            'dikembalikan' => $request->sampai,
-            'catatan' => $request->catatan,
-        ];
+        if (!$peminjam) {
+            throw ValidationException::withMessages([
+                'user' => 'Peminjam tidak ditemukan.',
+            ]);
+        }
 
         $alert = $this::execute(
-            try: fn () => $user->loans()->create($insert),
+            try: function () use ($request, $peminjam) {
+                DB::transaction(function () use ($request, $peminjam) {
+                    $buku = Book::whereKey($request->buku)->lockForUpdate()->firstOrFail();
+                    $dipinjam = Loan::where('book_id', $buku->id)->whereNull('returned_at')->count();
+
+                    if ($buku->jumlah_buku <= $dipinjam) {
+                        throw ValidationException::withMessages([
+                            'buku' => 'Stok buku tidak tersedia.',
+                        ]);
+                    }
+
+                    $peminjam->loans()->create([
+                        'book_id' => $buku->id,
+                        'dipinjam' => $request->dari,
+                        'dikembalikan' => $request->sampai,
+                        'catatan' => $request->catatan,
+                    ]);
+                });
+            },
             message: 'pinjam buku'
         );
 
@@ -105,7 +121,7 @@ class LoanController extends Controller
     {
         $loan->load('book');
         $alert = $this::execute(
-            try: fn () => $loan->delete(),
+            try: fn () => $loan->update(['returned_at' => now()]),
             message: 'konfirmasi <li>' . $loan->book->judul . '</li>'
         );
 
@@ -116,7 +132,7 @@ class LoanController extends Controller
     {
         $loan->load('book');
         $alert = $this::execute(
-            try: fn () => $loan->restore(),
+            try: fn () => $loan->update(['returned_at' => null]),
             message: 'batalkan <li>' . $loan->book->judul . '</li>'
         );
 

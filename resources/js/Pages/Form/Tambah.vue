@@ -122,8 +122,9 @@ function simpan() {
 
         <!-- Modal -->
         <Modal title="Pilih Sampul" id="sampul">
-            <FileInput v-model="formTambah.sampul" accept=".png,.jpg,.jpeg" @change="previewGambar($event)" />
-            <div class="text-sm text-red-500 mt-1">Gambar tidak boleh lebih dari 5000 KB</div>
+            <FileInput v-model="formTambah.sampul" accept=".png,.jpg,.jpeg,.webp" :invalid="formTambah.errors.sampul"
+                @change="previewGambar($event)" />
+            <div class="text-sm text-red-500 mt-1">Gambar tidak boleh lebih dari 2048 KB</div>
             <div class="p-4 border mt-2" v-if="urlPreview">
                 <div class="text-sm mb-1">Ukuran file: <b>{{ fotoSize }}</b></div>
                 <img :src="urlPreview" alt="preview">

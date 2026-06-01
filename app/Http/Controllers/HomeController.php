@@ -19,7 +19,6 @@ class HomeController extends Controller
 
             'bukuDipinjam' => Loan::with(['loanable:id,nama', 'book:id,judul'])
                 ->select('loanable_type', 'loanable_id', 'book_id')
-                ->withTrashed()
                 ->latest()
                 ->limit(6)
                 ->get(),
@@ -29,7 +28,6 @@ class HomeController extends Controller
                 ->selectRaw('COUNT(id) as total')
                 ->groupBy(['loanable_type', 'loanable_id'])
                 ->orderByDesc('total')
-                ->withTrashed()
                 ->limit(6)
                 ->get(),
         ]);
